@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каркасников — строительство каркасных домов под ключ в Санкт-Петербурге и Ленобласти</title>
+<meta name="description" content="Строим энергоэффективные каркасные, брусовые и газобетонные дома под ключ с 2014 года. Проектирование, фундамент, инженерия, бани. Санкт-Петербург и Ленинградская область.">
+<script type="importmap">
+{ "imports": { "three": "./assets/k3d/vendor/three.module.js", "three/addons/": "./assets/k3d/vendor/" } }
+</script>
+<style>
+:root{
+  --pine:#1d3a2f; --pine-2:#24473a; --pine-deep:#12271f;
+  --cream:#f4f1ea; --cream-2:#eee9df;
+  --amber:#c8862a; --amber-light:#e0a44a;
+  --text:#22302a; --text-mute:#5a6a62;
+  --white:#ffffff;
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;color:var(--text);background:var(--cream);line-height:1.6}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--amber);text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+section{padding:clamp(56px,8vw,96px) 0}
+
+/* ---------- top bar + nav ---------- */
+.topbar{background:var(--pine-deep);color:rgba(244,241,234,.75);font-size:.82rem;padding:.45rem 0}
+.topbar .container{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.topbar a{color:var(--amber-light)}
+.topbar .tb-right{display:flex;gap:1.4rem}
+header.nav{position:sticky;top:0;z-index:100;background:rgba(244,241,234,.94);backdrop-filter:blur(10px);border-bottom:1px solid #e2dccd}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0}
+.logo{display:flex;align-items:center;gap:.6rem;color:var(--pine);font-weight:800;font-size:1.15rem;letter-spacing:.02em}
+.logo svg{width:38px;height:38px;flex:none}
+.logo small{display:block;font-size:.62rem;font-weight:600;color:var(--text-mute);letter-spacing:.12em;text-transform:uppercase}
+nav.links{display:flex;gap:clamp(14px,2vw,26px);font-weight:600;font-size:.95rem}
+nav.links a{color:var(--pine-2);padding:.3rem 0;border-bottom:2px solid transparent;transition:.2s}
+nav.links a:hover{color:var(--amber);border-color:var(--amber)}
+.burger{display:none;background:none;border:0;color:var(--pine);cursor:pointer;padding:.3rem}
+.burger svg{width:26px;height:26px}
+@media(max-width:820px){
+  nav.links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);flex-direction:column;padding:1rem clamp(16px,4vw,40px) 1.4rem;box-shadow:0 12px 24px rgba(0,0,0,.12);border-bottom:1px solid #e2dccd}
+  nav.links.open{display:flex}
+  .burger{display:block}
+}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(rgba(18,39,31,.55),rgba(18,39,31,.65)),url('img/hero.jpg') center/cover no-repeat;color:var(--cream);padding:clamp(72px,10vw,130px) 0 clamp(56px,7vw,90px)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,4vw,48px);align-items:start}
+.hero-grid>*{min-width:0}
+.config-card{min-width:0}
+.hero h1{font-size:clamp(1.9rem,4.2vw,3.1rem);line-height:1.15;font-weight:800;margin-bottom:1.1rem;overflow-wrap:break-word}
+@media(max-width:560px){.hero h1{font-size:1.45rem}}
+.hero h1 em{color:var(--amber-light);font-style:normal}
+.hero p.sub{font-size:clamp(1rem,1.5vw,1.2rem);color:rgba(244,241,234,.85);max-width:34rem;margin-bottom:1.8rem}
+.hero-badges{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:2rem}
+.badge{background:rgba(244,241,234,.12);border:1px solid rgba(244,241,234,.28);border-radius:999px;padding:.45rem 1rem;font-size:.85rem;font-weight:600}
+.hero-cta{display:flex;gap:.9rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:10px;padding:.85rem 1.5rem;font-weight:700;font-size:.98rem;cursor:pointer;border:2px solid transparent;transition:.2s}
+.btn-amber{background:var(--amber);color:var(--white)}
+.btn-amber:hover{background:var(--amber-light)}
+.btn-ghost{background:transparent;color:var(--cream);border-color:rgba(244,241,234,.5)}
+.btn-ghost:hover{border-color:var(--cream)}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero-note{background:rgba(18,39,31,.35);border:1px solid rgba(224,164,74,.3);border-radius:var(--radius);padding:clamp(20px,3vw,36px)}
+.hero-note h3{color:var(--amber-light);font-size:1.25rem;margin-bottom:.6rem}
+.hero-note p{color:rgba(244,241,234,.85);font-size:.98rem;margin-bottom:1rem}
+.hero-note-link{color:var(--amber-light);font-weight:700;border-bottom:2px solid var(--amber)}
+
+/* ---------- 3D configurator (three.js, ported from KARKASKIN) ---------- */
+.builder-section{background:var(--pine-deep)}
+.builder-grid{display:grid;grid-template-columns:360px 1fr;gap:clamp(20px,3vw,36px);align-items:stretch}
+.builder-grid>*{min-width:0}
+.builder-panel{background:rgba(244,241,234,.05);border:1px solid rgba(224,164,74,.25);border-radius:var(--radius);padding:1.4rem}
+.builder-panel h3{color:var(--amber-light);margin-bottom:.3rem}
+.builder-panel .panel-sub{font-size:.86rem;color:rgba(244,241,234,.65);margin-bottom:1.2rem}
+.builder-panel .field{margin-bottom:.9rem}
+.builder-panel .field label{display:flex;align-items:baseline;gap:.4em;white-space:nowrap;font-size:.82rem;font-weight:600;color:rgba(244,241,234,.9);margin-bottom:.4rem;letter-spacing:.02em}
+.builder-panel .field label .hint{color:rgba(244,241,234,.55);font-weight:400;font-size:.74rem}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.builder-panel .input{width:100%;background:rgba(0,0,0,.35);border:1px solid rgba(224,164,74,.28);color:var(--cream);padding:.6rem .75rem;border-radius:10px;font-size:.95rem;transition:border-color .15s,box-shadow .15s}
+.builder-panel .input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,134,42,.22)}
+.roof-types{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.roof-chip{display:flex;align-items:center;gap:.5rem;padding:.6rem .7rem;border:1px solid rgba(224,164,74,.28);border-radius:10px;background:rgba(0,0,0,.3);cursor:pointer;font-size:.86rem;font-weight:500;color:rgba(244,241,234,.85);transition:all .15s}
+.roof-chip svg{width:30px;height:22px;flex:0 0 30px;color:var(--amber-light)}
+.roof-chip:hover{border-color:var(--amber);color:var(--white)}
+.roof-chip.active{background:rgba(200,134,42,.2);border-color:var(--amber);color:var(--white);box-shadow:0 0 0 2px rgba(200,134,42,.2)}
+.toggle-row{display:flex;align-items:center;gap:.6rem;font-size:.86rem;color:rgba(244,241,234,.85);margin:.6rem 0;cursor:pointer;user-select:none}
+.toggle-row input{appearance:none;width:34px;height:20px;background:rgba(0,0,0,.5);border:1px solid rgba(224,164,74,.3);border-radius:999px;position:relative;transition:background .2s;flex:0 0 34px}
+.toggle-row input::before{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--amber-light);transition:transform .2s}
+.toggle-row input:checked{background:rgba(200,134,42,.4)}
+.toggle-row input:checked::before{transform:translateX(14px)}
+.builder-actions{display:flex;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap}
+.builder-actions .btn{flex:1;min-width:130px}
+.btn-outline{background:transparent;color:var(--amber-light);border-color:var(--amber)}
+.btn-outline:hover{background:rgba(200,134,42,.15)}
+.builder-view{position:relative;border-radius:var(--radius);overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#22302a 0%,#12271f 80%);border:1px solid rgba(224,164,74,.25);min-height:440px;display:flex;flex-direction:column}
+#builder-canvas{width:100%;height:100%;display:block;flex:1;touch-action:none}
+.view-overlay{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:1rem 1.2rem;z-index:2}
+.view-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.view-info{background:rgba(10,20,15,.65);backdrop-filter:blur(8px);padding:.7rem 1rem;border-radius:12px;border:1px solid rgba(224,164,74,.3);font-size:.82rem;color:rgba(244,241,234,.85)}
+.view-info b{color:var(--amber-light);font-weight:700;font-size:.95rem;display:block;margin-bottom:.15rem}
+.view-controls{display:flex;gap:.4rem;pointer-events:auto}
+.view-btn{width:38px;height:38px;border-radius:10px;background:rgba(10,20,15,.7);border:1px solid rgba(224,164,74,.3);color:var(--amber-light);display:grid;place-items:center;transition:all .15s;cursor:pointer}
+.view-btn:hover{background:rgba(200,134,42,.2);color:var(--white);transform:translateY(-1px)}
+.view-btn svg{width:18px;height:18px}
+.view-bottom{font-size:.74rem;color:rgba(244,241,234,.78);text-align:center}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.legend span{display:inline-flex;align-items:center;gap:.35em}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.builder-result{margin-top:1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.7rem}
+.stat-box{background:rgba(244,241,234,.05);border:1px solid rgba(224,164,74,.22);border-radius:12px;padding:.85rem .9rem;text-align:center}
+.stat-box .v{font-size:1.4rem;font-weight:700;color:var(--amber-light);line-height:1}
+.stat-box .l{font-size:.72rem;color:rgba(244,241,234,.8);text-transform:uppercase;letter-spacing:.05em;margin-top:.3rem}
+@media(max-width:1024px){.builder-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.field-row{grid-template-columns:1fr}.builder-view{min-height:340px}}
+
+/* ---------- section heads ---------- */
+.section-head{max-width:720px;margin:0 auto clamp(36px,5vw,56px);text-align:center}
+.section-head .lead{margin-left:auto;margin-right:auto}
+.eyebrow{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:.9rem}
+h2{font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.2;margin-bottom:.8rem;color:var(--pine)}
+.lead{font-size:clamp(1rem,1.4vw,1.1rem);color:var(--text-mute);max-width:60ch}
+.section-dark{background:var(--pine);color:var(--cream)}
+.section-dark h2{color:var(--cream)}
+.section-dark .lead{color:rgba(244,241,234,.75)}
+
+/* ---------- tech cards ---------- */
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:clamp(18px,2.5vw,28px)}
+.tech-card{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 22px rgba(34,48,42,.08);transition:.25s}
+.tech-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(34,48,42,.14)}
+.tech-card .thumb{height:200px;overflow:hidden}
+.tech-card .thumb img{width:100%;height:100%;object-fit:cover}
+.tech-card .body{padding:1.3rem 1.4rem 1.5rem}
+.tech-card h3{font-size:1.15rem;color:var(--pine);margin-bottom:.5rem}
+.tech-card p{font-size:.92rem;color:var(--text-mute)}
+.tech-card .tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:.55rem}
+
+/* ---------- features ---------- */
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:clamp(18px,2.5vw,28px)}
+.feat{background:rgba(244,241,234,.06);border:1px solid rgba(244,241,234,.16);border-radius:var(--radius);padding:1.6rem}
+.feat .ic{width:52px;height:52px;border-radius:12px;background:rgba(224,164,74,.18);display:flex;align-items:center;justify-content:center;color:var(--amber-light);margin-bottom:1rem}
+.feat .ic svg{width:26px;height:26px}
+.feat h3{font-size:1.05rem;margin-bottom:.5rem}
+.feat p{font-size:.9rem;color:rgba(244,241,234,.72)}
+
+/* ---------- gallery / works ---------- */
+.works-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:clamp(16px,2.5vw,26px)}
+.work{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3;cursor:pointer}
+.work img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.work:hover img{transform:scale(1.06)}
+.work .cap{position:absolute;inset:auto 0 0 0;padding:1.6rem 1.1rem 1rem;background:linear-gradient(transparent,rgba(18,39,31,.92));color:var(--cream)}
+.work .cap b{display:block;font-size:1rem}
+.work .cap span{font-size:.8rem;color:rgba(244,241,234,.75)}
+.work .cap .loc{font-size:.72rem;color:var(--amber-light);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:.2rem}
+
+/* ---------- price table ---------- */
+.price-wrap{overflow-x:auto}
+.price-table{width:100%;min-width:620px;border-collapse:collapse;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 22px rgba(34,48,42,.08)}
+.price-table th{background:var(--pine);color:var(--cream);text-align:left;padding:.9rem 1.1rem;font-size:.9rem;letter-spacing:.03em}
+.price-table td{padding:.9rem 1.1rem;border-bottom:1px solid #eee9df;font-size:.95rem}
+.price-table tr:last-child td{border-bottom:0}
+.price-table td .mut{color:var(--text-mute);font-size:.85rem}
+.price-note{font-size:.85rem;color:var(--text-mute);margin-top:1rem;text-align:center}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(18px,2.5vw,26px);counter-reset:step}
+.step{position:relative;padding:1.5rem 1.4rem;background:var(--white);border-radius:var(--radius);box-shadow:0 6px 16px rgba(34,48,42,.06)}
+.step::before{counter-increment:step;content:counter(step,decimal-leading-zero);position:absolute;top:-14px;left:1.2rem;background:var(--amber);color:var(--white);font-weight:800;font-size:.85rem;padding:.25rem .7rem;border-radius:8px;letter-spacing:.08em}
+.step h3{font-size:1rem;color:var(--pine);margin-bottom:.4rem}
+.step p{font-size:.88rem;color:var(--text-mute)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(24px,4vw,48px)}
+.contact-info{display:flex;flex-direction:column;gap:1rem}
+.ci-item{display:flex;gap:1rem;align-items:flex-start;background:rgba(244,241,234,.06);border:1px solid rgba(244,241,234,.16);padding:1.1rem 1.3rem;border-radius:12px}
+.ci-ic{flex:none;width:44px;height:44px;border-radius:10px;background:rgba(224,164,74,.18);display:flex;align-items:center;justify-content:center;color:var(--amber-light)}
+.ci-ic svg{width:22px;height:22px}
+.ci-item h4{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--amber-light);margin-bottom:.25rem}
+.ci-item .v{font-size:.98rem;color:var(--cream)}
+.form-card{background:var(--white);border-radius:var(--radius);padding:clamp(20px,3vw,32px);box-shadow:0 10px 26px rgba(34,48,42,.12)}
+.form-card h3{font-size:1.25rem;color:var(--pine);margin-bottom:.4rem}
+.form-card .fs{font-size:.9rem;color:var(--text-mute);margin-bottom:1.2rem}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.f-grid .full{grid-column:1/-1}
+.f-grid label{display:block;font-size:.78rem;font-weight:700;color:var(--text-mute);margin-bottom:.3rem}
+.f-grid input,.f-grid select,.f-grid textarea{width:100%;padding:.7rem .8rem;border-radius:9px;border:1px solid #d5cfbf;font-size:.95rem;font-family:inherit;background:var(--cream)}
+.f-grid input:focus,.f-grid select:focus,.f-grid textarea:focus{outline:2px solid var(--amber);border-color:var(--amber)}
+.f-grid textarea{resize:vertical;min-height:110px}
+.f-grid .btn{grid-column:1/-1;width:100%}
+.form-ok{display:none;background:#e8f4ea;border:1px solid #b9dcc3;color:#1d5c33;border-radius:10px;padding:1rem 1.2rem;font-size:.95rem;margin-top:1rem}
+@media(max-width:820px){.contact-grid{grid-template-columns:1fr}.f-grid{grid-template-columns:1fr}}
+
+/* ---------- footer ---------- */
+footer{background:var(--pine-deep);color:rgba(244,241,234,.7);padding:2.5rem 0 2rem}
+.foot{display:flex;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;align-items:center}
+footer .f-logo{color:var(--cream);font-weight:800}
+footer .f-copy{font-size:.85rem}
+footer .f-links a{color:rgba(244,241,234,.7);margin-left:1.2rem;font-size:.85rem}
+footer .f-links a:hover{color:var(--amber-light)}
+
+/* ---------- toast + lightbox ---------- */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--pine-deep);color:var(--amber-light);padding:.85rem 1.4rem;border-radius:999px;font-weight:600;font-size:.92rem;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:200;opacity:0;transition:all .3s;border:1px solid rgba(224,164,74,.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.lb{display:none;position:fixed;inset:0;background:rgba(10,20,15,.9);z-index:200;align-items:center;justify-content:center;padding:4vw;cursor:zoom-out}
+.lb.open{display:flex}
+.lb img{max-width:96vw;max-height:92vh;border-radius:10px}
+.lb .lb-cap{position:absolute;bottom:2rem;left:0;right:0;text-align:center;color:var(--cream);font-size:.95rem}
+
+
+
+/* ===== k3d: правки секции конструктора ===== */
+.builder-section h2{color:var(--cream)}
+.builder-section .lead{color:rgba(244,241,234,.8)}
+.builder-section .section-head{margin-bottom:clamp(24px,3vw,34px)}
+/* ===== /k3d ===== */
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP BAR ===================== -->
+<div class="topbar">
+  <div class="container">
+    <div>Работаем с 2014 года — Санкт-Петербург и Ленинградская область</div>
+    <div class="tb-right">
+      <a href="mailto:karkasnikov@mail.ru">karkasnikov@mail.ru</a>
+      <a href="tel:+79119249470" style="color:#e0a44a;font-weight:700">+7 (911) 924-94-70</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="#top">
+      <svg viewBox="0 0 48 48" fill="none"><path d="M8 40V20L24 8l16 12v20" stroke="#1d3a2f" stroke-width="3" stroke-linejoin="round"/><path d="M8 40h32M24 8v10M17 18l7-7 7 7M15 27h18M24 27v13" stroke="#c8862a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>КАРКАСНИКОВ<small>дома под ключ</small></span>
+    </a>
+    <nav class="links" id="navLinks">
+      <a href="#builder">3D-конструктор</a>
+      <a href="#tech">Технологии</a>
+      <a href="#works">Наши работы</a>
+      <a href="#how">Как работаем</a>
+      <a href="#prices">Цены</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Меню"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="top">
+  <div class="container hero-grid">
+    <div>
+      <h1>Строим <em>энергоэффективные</em> дома под ключ</h1>
+      <p class="sub">Каркасные, брусовые и газобетонные дома в Санкт-Петербурге и Ленинградской области. Проектирование, фундамент, коробка, инженерия и отделка — от одной команды, с фиксированной сметой и сроком в договоре.</p>
+      <div class="hero-badges">
+        <span class="badge">С 2014 года</span>
+        <span class="badge">Срок от 1 до 3 месяцев</span>
+        <span class="badge">Договор и смета</span>
+        <span class="badge">СНиП / СП 31-105</span>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-amber" href="#builder">Открыть 3D-конструктор</a>
+        <a class="btn btn-ghost" href="#contacts">Получить расчёт стоимости</a>
+      </div>
+    </div>
+    <div class="hero-note">
+      <h3>Прикиньте свой дом за минуту</h3>
+      <p>Ниже на странице — интерактивный 3D-конструктор: введите габариты, выберите крышу, покрутите модель и сразу отправьте эти параметры нам на расчёт.</p>
+      <a href="#builder" class="hero-note-link">К конструктору ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 3D BUILDER (ported from KARKASKIN site) ===================== -->
+<section class="section builder-section" id="builder">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Интерактивный конструктор</span>
+      <h2>Постройте 3D-модель вашего дома</h2>
+      <p class="lead">Введите габариты — и на лету соберётся 3D-модель каркаса с фермами и стропилами. Модель генерируется под ваши размеры, её можно вращать, приближать и рассматривать с любого ракурса.</p>
+    </div>
+
+    <div data-k3d data-accent="#c8862a" data-spec-target="#cfg-spec"></div>
+    <div class="cfg__out" id="cfg-spec"></div>
+  </div>
+</section>
+
+<!-- ===================== TECH ===================== -->
+<section class="section" id="tech">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Технологии</span>
+      <h2>Выберите материал — мы построим из любого</h2>
+      <p class="lead">Работаем четырьмя проверенными технологиями. Подскажем, какая подойдёт под ваш бюджет, участок и режим проживания — зимой или «дачный».</p>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="thumb"><img src="img/house2.jpg" alt="Каркасный дом" loading="lazy"></div>
+        <div class="body">
+          <span class="tag">1 сезон</span>
+          <h3>Каркасный дом</h3>
+          <p>Строительство по СП 31-105-2002: утеплитель 150–200 мм в стенах, пароизоляция, ветрозащита. Быстрый монтаж круглый год — корпус за 3–4 недели.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="thumb"><img src="img/build1.jpg" alt="Дом из бруса" loading="lazy"></div>
+        <div class="body">
+          <span class="tag">1–2 сезона</span>
+          <h3>Дом из бруса</h3>
+          <p>Профилированный и клеёный брус: естественная фактура дерева, усадка компенсируется технологическими зазорами. Дышащая, тёплая конструкция.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="thumb"><img src="img/build3.jpg" alt="Газобетонный дом" loading="lazy"></div>
+        <div class="body">
+          <span class="tag">1 сезон</span>
+          <h3>Дом из газобетона</h3>
+          <p>Тёплые блоки D400–D500 с тонким швом: ровная геометрия стен, огнестойкость, комфортная теплоёмкость для зимнего проживания.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="thumb"><img src="img/interior3.jpg" alt="Кирпичный дом" loading="lazy"></div>
+        <div class="body">
+          <span class="tag">Классика на века</span>
+          <h3>Кирпичный дом</h3>
+          <p>Полный и облицовочный кирпич: максимальная долговечность и статусность фасада. Требует утепления — сделаем «пирог» под ваш климат.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FEATURES ===================== -->
+<section class="section section-dark" id="why">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Почему выбирают нас</span>
+      <h2>Платите только за реально проделанную работу</h2>
+      <p class="lead">Смета фиксируется в договоре до старта: поэтапная оплата по принятым работам, без «внезапных» доплат.</p>
+    </div>
+    <div class="features">
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <h3>Прозрачная экономия</h3>
+        <p>Поэтапная оплата: вы принимаете каждый этап и платите за него, а не «за обещания». Фотоотчёт с объекта — в мессенджер каждую неделю.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4M12 3l7 4v5c0 4.4-3 8.3-7 9-4-.7-7-4.6-7-9V7l7-4z"/></svg></div>
+        <h3>Гарантия качества</h3>
+        <p>Строим по СНиП и СП 31-105-2002. Гарантия на конструктив и кровлю прописана в договоре, ответственные узлы — на фото до закрытия отделкой.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>Срок в договоре</h3>
+        <p>От 1 до 3 месяцев на коробку под ключ. График работ с контрольными датами — за срыв сроков отвечаем рублём по договору.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13M9 21v-8h6v8"/></svg></div>
+        <h3>Полный цикл</h3>
+        <p>Проект, фундамент, коробка, кровля, инженерия и отделка — одна команда. Не ищете десяти подрядчиков, отвечаем за результат целиком.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WORKS ===================== -->
+<section class="section" id="works">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Наши работы</span>
+      <h2>Построено в Ленобласти и СПб</h2>
+      <p class="lead">Жилые дома, бани и инженерные объекты от Выборга до Приозерска. Нажмите на фото, чтобы открыть его целиком.</p>
+    </div>
+    <div class="works-grid">
+      <figure class="work" data-cap="Жилой дом, п. Поляны, Выборгский район" data-img="img/house2.jpg"><img src="img/house2.jpg" alt="Жилой дом, п. Поляны" loading="lazy"><figcaption class="cap"><span class="loc">Выборгский район</span><b>Жилой дом, п. Поляны</b><span>Каркас, 2 этажа, под ключ</span></figcaption></figure>
+      <figure class="work" data-cap="Коттедж, Солнечный мыс, Выборгский район" data-img="img/house3.jpg"><img src="img/house3.jpg" alt="Коттедж, Солнечный мыс" loading="lazy"><figcaption class="cap"><span class="loc">Выборгский район</span><b>Коттедж, Солнечный мыс</b><span>Газобетон, мансарда</span></figcaption></figure>
+      <figure class="work" data-cap="Баня из бруса, Б. Коновалово, Ломоносовский район" data-img="img/banya1.jpg"><img src="img/banya1.jpg" alt="Баня из бруса" loading="lazy"><figcaption class="cap"><span class="loc">Ломоносовский район</span><b>Баня из бруса</b><span>6×4 м, парная + комната отдыха</span></figcaption></figure>
+      <figure class="work" data-cap="Дом с гаражом, Гатчина" data-img="img/build2.jpg"><img src="img/build2.jpg" alt="Дом с гаражом, Гатчина" loading="lazy"><figcaption class="cap"><span class="loc">Гатчина</span><b>Дом с гаражом</b><span>Каркас, 120 м², встроенный гараж</span></figcaption></figure>
+      <figure class="work" data-cap="Загородный дом, п. Моторное, Приозерский район" data-img="img/interior1.jpg"><img src="img/interior1.jpg" alt="Дом, п. Моторное" loading="lazy"><figcaption class="cap"><span class="loc">Приозерский район</span><b>Дом, п. Моторное</b><span>Интерьер гостиной после отделки</span></figcaption></figure>
+      <figure class="work" data-cap="Монтаж каркаса, Ленобласть" data-img="img/build3.jpg"><img src="img/build3.jpg" alt="Монтаж каркаса" loading="lazy"><figcaption class="cap"><span class="loc">Объект в работе</span><b>Монтаж каркаса</b><span>Рабочий процесс: стены и стропила</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HOW ===================== -->
+<section class="section section-dark" id="how">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Как мы работаем</span>
+      <h2>От звонка до ключей — шесть шагов</h2>
+      <p class="lead">Каждый этап — с понятным результатом и приёмкой. Половина заказов приходит по рекомендации — нам важно, чтобы вы остались довольны.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Заявка и брифинг</h3><p>Обсуждаем бюджет, участок, режим проживания (зимний / дачный). Подбираем технологию и проект.</p></div>
+      <div class="step"><h3>Проект и смета</h3><p>Адаптируем проект под ваш участок: планировка, фундамент, инженерия. Смета с фиксированными позициями.</p></div>
+      <div class="step"><h3>Договор</h3><p>Сроки, этапы, стоимость и гарантия — письменно. Поэтапная оплата, график контрольных дат.</p></div>
+      <div class="step"><h3>Фундамент и коробка</h3><p>Монолитный фундамент или цоколь, затем каркас / брус / газобетон и кровля — под крышу за первый месяц.</p></div>
+      <div class="step"><h3>Инженерия и отделка</h3><p>Электрика, отопление, вентиляция, вода. Чистовая отделка — от вагонки до покраски фасада.</p></div>
+      <div class="step"><h3>Сдача и регистрация</h3><p>Приёмка по чек-листу, ключи и документы. Помогаем с регистрацией дома и сопровождением сделки.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRICES ===================== -->
+<section class="section" id="prices">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Цены</span>
+      <h2>Стартовые бюджеты 2026 года</h2>
+      <p class="lead">Итоговая стоимость зависит от проекта и участка — точную смету подготовим бесплатно после брифинга.</p>
+    </div>
+    <div class="price-wrap">
+      <table class="price-table">
+        <thead><tr><th>Формат</th><th>Площадь</th><th>Срок</th><th>Цена «под ключ»</th></tr></thead>
+        <tbody>
+          <tr><td><b>Дом «Дачный»</b><div class="mut">каркас, 1 этаж, 6×6 м</div></td><td>36 м²</td><td>от 1 мес.</td><td><b>от 1 млн ₽</b></td></tr>
+          <tr><td><b>Дом «Сезонный+»</b><div class="mut">каркас, 1 этаж + мансарда</div></td><td>72 м²</td><td>от 1,5 мес.</td><td><b>от 2,1 млн ₽</b></td></tr>
+          <tr><td><b>Дом «FAVORIT 150»</b><div class="mut">7×12 м, газобетон или брус</div></td><td>150 м²</td><td>от 2 мес.</td><td><b>от 4,2 млн ₽</b></td></tr>
+          <tr><td><b>Баня из бруса</b><div class="mut">6×4 м, парная + отдых</div></td><td>24 м²</td><td>от 1 мес.</td><td><b>от 900 тыс. ₽</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="price-note">В смету «под ключ» входят: фундамент, коробка, кровля, окна и двери, базовая инженерия. Точную стоимость считаем после осмотра участка — выезд в пределах СПб и Ленобласти бесплатный.</p>
+  </div>
+</section>
+
+<!-- ===================== CONTACTS ===================== -->
+<section class="section section-dark" id="contacts">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Контакты</span>
+      <h2>Свяжитесь с нами</h2>
+      <p class="lead">Расскажите про участок и желаемый дом — ответим с предварительным расчётом в течение рабочего дня.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="ci-item"><div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><h4>Офис</h4><div class="v">г. Санкт-Петербург,<br>Санкт-Петербургский пр., 60</div></div></div>
+        <div class="ci-item"><div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z"/></svg></div><div><h4>Телефон</h4><div class="v"><a href="tel:+79119249470" style="color:#e0a44a">+7 (911) 924-94-70</a></div></div></div>
+        <div class="ci-item"><div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM4 8l8 5 8-5"/></svg></div><div><h4>Почта</h4><div class="v"><a href="mailto:karkasnikov@mail.ru" style="color:#e0a44a">karkasnikov@mail.ru</a></div></div></div>
+        <div class="ci-item"><div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><h4>Режим работы</h4><div class="v">Пн–Сб, 9:00–19:00<br>Выезд на участок — бесплатно</div></div></div>
+      </div>
+      <div class="form-card">
+        <h3>Рассчитать мой дом</h3>
+        <p class="fs">Заполните форму — ответим с предварительной сметой в течение рабочего дня.</p>
+        <div id="lead-wizard" class="card" style="padding:clamp(18px,3vw,32px)"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="container foot">
+    <div>
+      <div class="f-logo">КАРКАСНИКОВ</div>
+      <div class="f-copy">Строительство энергоэффективных домов под ключ. © 2014–2026.</div>
+    </div>
+    <div class="f-links">
+      <a href="#tech">Технологии</a><a href="#works">Работы</a><a href="#prices">Цены</a><a href="#contacts">Контакты</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== LIGHTBOX ===================== -->
+<div class="lb" id="lb"><img id="lbImg" src="" alt=""><div class="lb-cap" id="lbCap"></div></div>
+
+<script>
+/* ---------- burger ---------- */
+document.getElementById('burger').addEventListener('click',function(){
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('#navLinks a').forEach(function(a){
+  a.addEventListener('click',function(){document.getElementById('navLinks').classList.remove('open');});
+});
+
+/* ---------- lightbox ---------- */
+var lb=document.getElementById('lb');
+document.querySelectorAll('.work').forEach(function(w){
+  w.addEventListener('click',function(){
+    document.getElementById('lbImg').src=w.dataset.img;
+    document.getElementById('lbCap').textContent=w.dataset.cap;
+    lb.classList.add('open');
+  });
+});
+lb.addEventListener('click',function(){lb.classList.remove('open');});
+
+/* ---------- toast (used by 3D builder) ---------- */
+var toastTimer;
+function toast(msg){
+  var t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show');},2600);
+}
+window.toast=toast;
+
+/* ---------- form ---------- */
+</script>
+
+<script type="module" src="./assets/k3d/k3d.js"></script>
+<script src="./assets/k3d/lead-wizard.js" defer></script>
+</body>
+</html>
